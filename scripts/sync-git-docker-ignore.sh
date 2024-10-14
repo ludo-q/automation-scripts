@@ -36,7 +36,7 @@ function copy_git_docker_ignore() {
 
   # Check if the .dockerignore file is present in the root folder
   if [ ! -f "$docker_ignore" ]; then
-    echo "Creating and updating .dockerignore file"
+    echo "Creating and updating .dockerignore with the content of .gitignore"
     cp "$git_ignore" "$docker_ignore"
     return 0
   fi
@@ -87,7 +87,7 @@ for project in "$WORKSPACE_ROOT"/*; do
       if [ $? -eq 0 ]; then
         copy_git_docker_ignore "$project"
       else
-        echo "Skipping, Git or Docker is not used."
+        echo "Skipping, Git or Docker not used."
       fi
     else
       echo "Skipping, Not an Angular, Next, or Django!!!"

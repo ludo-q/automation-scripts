@@ -39,13 +39,13 @@ function CopyGitDockerIgnore {
     if (Test-Path $dockerIgnore) {
         $diff = Compare-Object (Get-Content $gitIgnore) (Get-Content $dockerIgnore)
         if ($diff) {
-            Write-Output "Updating $dockerIgnore with the content of $gitIgnore"
+            Write-Output "Updating .dockerignore with the content of .gitignore"
             Copy-Item $gitIgnore $dockerIgnore -Force
         } else {
-            Write-Output "The content of $gitIgnore is the same as the content of $dockerIgnore. Skipping the project."
+            Write-Output "Skipping, .dockerignore is up to date."
         }
     } else {
-        Write-Output "Creating $dockerIgnore and copying the content of $gitIgnore"
+        Write-Output "Creating and updating .dockerignore with the content of .gitignore"
         Copy-Item $gitIgnore $dockerIgnore -Force
     }
 }
@@ -83,16 +83,20 @@ function CheckGitUsage {
     return $false
 }
 
+echo "****************************************************************"
 # Main logic to iterate over projects
 Get-ChildItem -Path $WORKSPACE_ROOT -Directory | ForEach-Object {
     $project = $_.FullName
+    Write-Output "================="
+    Write-Output "Checking project: $project"
     if (CheckProjectType -projectRoot $project) {
         if (CheckGitUsage -projectRoot $project) {
             CopyGitDockerIgnore -projectRoot $project
         } else {
-            Write-Output "Skipping ${project}: Git not used."
+            Write-Output "Skipping, Git or Docker not used."
         }
     } else {
-        Write-Output "Skipping ${project}: Not an Angular, React, or Django project."
+        Write-Output "Skipping, Not an Angular, React, or Django project."
     }
 }
+echo "****************************************************************"
